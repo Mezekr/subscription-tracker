@@ -7,16 +7,18 @@ userRouter.get('/', (req, res) => {
 });
 
 userRouter.get('/:id', (req, res) => {
-	res.send({ title: 'GET a users' });
+	res.send({ title: 'GET a user details' });
 });
 
 userRouter.post('/', (req, res) => {
-	res.send({ title: 'CREATE a users' });
+	res.send({ title: 'CREATE a new user' });
 });
 
 userRouter.put('/:id', (req, res) => {
 	res.send({ title: 'UPDATE users detail' });
 });
 userRouter.delete('/:id', (req, res) => {
-	res.send({ title: 'DELETE    	 a users' });
+	res.send({ title: 'DELETE a user' });
 });
+
+export default userRouter;
