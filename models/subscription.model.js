@@ -75,8 +75,6 @@ const subscriptionSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-const Subscription = mongoose.model('Subscription', subscriptionSchema);
-
 subscriptionSchema.pre('save', function (next) {
 	//calculate renewal date  based on renewal frequency
 	if (!this.renewalDate) {
@@ -101,5 +99,7 @@ subscriptionSchema.pre('save', function (next) {
 	//continue with creation of the document
 	next();
 });
+
+const Subscription = mongoose.model('Subscription', subscriptionSchema);
 
 export default Subscription;
