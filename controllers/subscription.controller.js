@@ -1,3 +1,5 @@
+import { SERVER_URL } from '../config/env.js';
+import { workflowClient } from '../config/upstash.js';
 import Subscription from '../models/subscription.model.js';
 
 export const createSubscription = async (req, res, next) => {
@@ -6,11 +8,26 @@ export const createSubscription = async (req, res, next) => {
 			...req.body,
 			user: req.user._id,
 		});
-		res.status(201).json({
+
+		// initiate the Subscription remainder
+		const { workflowRunId } = await workflowClient.trigger({
+			url: `${SERVER_URL}/api/v1/workflows/subscription/reminder`,
+			body: {
+				subscriptionId: subscription.id,
+			},
+			headers: {
+				'Content-type': 'application/json',
+			},
+			retries: 0,
+		});
+		console.log('Send Remainder from create Subscription');
+
+		await res.status(201).json({
 			success: true,
 			message: 'Subscription successfully created',
 			data: {
 				subscription,
+				workflowRunId,
 			},
 		});
 	} catch (error) {
