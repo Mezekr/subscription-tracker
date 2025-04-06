@@ -1,20 +1,24 @@
-import { serve } from '@upstash/workflow/express';
 import dayjs from 'dayjs';
-import Subscription from '../models/subscription.model';
+import { createRequire } from 'module';
+import Subscription from '../models/subscription.model.js';
+const require = createRequire(import.meta.url);
+const { serve } = require('@upstash/workflow/express');
+
+const REMINDERS = [7, 3, 1];
 
 export const sendRemainder = serve(async (context) => {
+	console.log('Send Remainder');
+
 	const { subscriptionId } = context.requestPayload;
 	const subscription = await fetchSubscription(context, subscriptionId);
 
-	const REMINDERS = [7, 3, 1];
+	if (!subscription || subscription.status !== 'active') return;
 
-	if (!subscription || subscription.status === 'inactive') return;
-
-	const renewalDate = dayjs(Subscription.renewalDate);
+	const renewalDate = dayjs(subscription.renewalDate);
 
 	if (renewalDate.isBefore(dayjs())) {
 		console.log(
-			`Renewal date has passed for the Subscription ${subscriptionId}. Stopping workflow`
+			`Renewal date has passed for the Subscription ${subscriptionId}. Stopping workflow.`
 		);
 		return;
 	}
@@ -33,7 +37,7 @@ export const sendRemainder = serve(async (context) => {
 });
 
 const fetchSubscription = async (context, subscriptionId) => {
-	return context.run('get Subscription', () => {
+	return context.run('get subscription', async () => {
 		return Subscription.findById(subscriptionId).populate(
 			'user',
 			'name email'
@@ -43,11 +47,11 @@ const fetchSubscription = async (context, subscriptionId) => {
 
 const sleepUntilRemainder = async (context, label, date) => {
 	console.log(`Sleeping until ${label} reminder at ${date}`);
-	return await context.sleepUntil('Sleep Remainder', date.toDate());
+	return await context.sleepUntil(label, date.toDate());
 };
 
 const triggerRemainder = async (context, label) => {
-	return await context.run(`${label}`, async () => {
+	return await context.run(label, async () => {
 		console.log(`Trigger ${label} Reminder`);
 		// Send E-mail , SMS or push notification
 	});
