@@ -4,11 +4,9 @@ import Subscription from '../models/subscription.model.js';
 const require = createRequire(import.meta.url);
 const { serve } = require('@upstash/workflow/express');
 
-const REMINDERS = [7, 3, 1];
+const REMINDERS = [7, 5, 3, 1];
 
 export const sendRemainder = serve(async (context) => {
-	console.log('Send Remainder');
-
 	const { subscriptionId } = context.requestPayload;
 	const subscription = await fetchSubscription(context, subscriptionId);
 
@@ -24,9 +22,9 @@ export const sendRemainder = serve(async (context) => {
 	}
 
 	for (const daysBefore of REMINDERS) {
-		const renewalDate = renewalDate.subtract(daysBefore, 'day');
+		const reminderDate = renewalDate.subtract(daysBefore, 'day');
 
-		if (renewalDate.isAfter())
+		if (reminderDate.isAfter())
 			await sleepUntilRemainder(
 				context,
 				`Remainder ${daysBefore} days before`,

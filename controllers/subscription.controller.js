@@ -11,7 +11,7 @@ export const createSubscription = async (req, res, next) => {
 
 		// initiate the Subscription remainder
 		const { workflowRunId } = await workflowClient.trigger({
-			url: `${SERVER_URL}/api/v1/workflows/subscription/reminder`,
+			url: `${SERVER_URL}/app/v1/workflows/subscription/remainder`,
 			body: {
 				subscriptionId: subscription.id,
 			},
@@ -20,7 +20,6 @@ export const createSubscription = async (req, res, next) => {
 			},
 			retries: 0,
 		});
-		console.log('Send Remainder from create Subscription');
 
 		await res.status(201).json({
 			success: true,
