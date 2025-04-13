@@ -30,7 +30,12 @@ export const sendRemainder = serve(async (context) => {
 				`Remainder ${daysBefore} days before`,
 				renewalDate
 			);
-		await triggerRemainder(context, `Remainder ${daysBefore} days before`);
+		if (dayjs().isSame(reminderDate, 'day')) {
+			await triggerRemainder(
+				context,
+				`Remainder ${daysBefore} days before`
+			);
+		}
 	}
 });
 
